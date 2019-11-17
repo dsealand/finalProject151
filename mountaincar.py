@@ -6,6 +6,10 @@ import argparse
 import math
 turtle = None #placeholder for turtle module
 
+class Function:    
+    def getValue(self, x, y):
+        return x*y
+
 class MountainCar:
     '''Represents the Mountain Car problem.'''
     def __init__(self):
@@ -13,34 +17,38 @@ class MountainCar:
 
     def reset(self):
         '''Resets the problem to the initial state.'''                
-        self.__pos = -0.5
-        self.__vel = 0
+        self.__xPos = 0
+        self.__yPos = 0
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
         if self.isTerminal():
             return 0
         
-        if action not in range(3):
+        if action not in range(360):
             raise ValueError("Invalid action: " + str(action))
 
-        direction = action - 1
+        actionRadian = math.radians(action)
 
-        self.__pos += self.__vel
+        surface = Function()
+        initialCost = surface.getValue(self.__xPos, self.__yPos)
 
-        if self.__pos > 0.6:
-            self.__pos = 0.6
-        elif self.__pos < -1.2:
-            self.__pos = -1.2
+        self.__xPos += math.cos(actionRadian)
+        self.__yPos += math.sin(actionRadian)
 
-        self.__vel += direction*(0.001) + math.cos(3*self.__pos)*(-0.0025)
+        if self.__xPos > 10:
+            self.__xPos = 10
+        elif self.__xPos < 0:
+            self.__xPos = 0
 
-        if self.__vel > 0.07:
-            self.__vel = 0.07
-        elif self.__vel < -0.07:
-            self.__vel = -0.07
+        if self.__yPos > 10:
+            self.__yPos = 10
+        elif self.__yPos < 0:
+            self.__yPos = 0
 
-        return -1
+        cost = surface.getValue(self.__xPos, self.__yPos) - initialCost
+
+        return -1 - cost
 
     def isTerminal(self):
         '''Returns true if the world is in a terminal state (if the car is at the top of the hill).'''
@@ -48,11 +56,11 @@ class MountainCar:
 
     def getState(self):
         '''Returns a tuple containing the position and velocity of the car, in that order.'''
-        return (self.__pos, self.__vel)
+        return (self.__pos)
 
     def getRanges(self):
         '''Returns a tuple of lists representing the ranges of the two state variables. There are two lists of two elements each, the minimum and maximum value, respectively.'''
-        return ([-1.2, 0.6], [-0.07, 0.07])
+        return ([0, 10], [0, 10])
     
     def __str__(self):
         return "p: " + str(self.__pos) + "v: " + str(self.__vel)
