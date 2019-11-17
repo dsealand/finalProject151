@@ -19,6 +19,8 @@ class MountainCar:
         '''Resets the problem to the initial state.'''                
         self.__xPos = 0
         self.__yPos = 0
+        self.__xEnd = random.random() * 10
+        self.__yEnd = random.random() * 10        
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
@@ -52,18 +54,18 @@ class MountainCar:
 
     def isTerminal(self):
         '''Returns true if the world is in a terminal state (if the car is at the top of the hill).'''
-        return self.__pos >= 0.6
+        return self.__xPos == self.__xEnd and self.__yPos == self.__yEnd
 
     def getState(self):
         '''Returns a tuple containing the position and velocity of the car, in that order.'''
-        return (self.__pos)
+        return (self.__xPos,self.__yPos)
 
     def getRanges(self):
         '''Returns a tuple of lists representing the ranges of the two state variables. There are two lists of two elements each, the minimum and maximum value, respectively.'''
         return ([0, 10], [0, 10])
     
     def __str__(self):
-        return "p: " + str(self.__pos) + "v: " + str(self.__vel)
+        return "xpos: " + str(self.__xPos) + "ypos: " + str(self.__yPos)
 
 class MountainCarDisplay:
     '''Uses turtle to visualize the Mountain Car problem.'''
