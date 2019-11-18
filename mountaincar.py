@@ -14,13 +14,14 @@ class MountainCar:
     '''Represents the Mountain Car problem.'''
     def __init__(self):
         self.reset()
+        self.__xEnd = random.random() * 10
+        self.__yEnd = random.random() * 10 
 
     def reset(self):
         '''Resets the problem to the initial state.'''                
-        self.__xPos = 0
-        self.__yPos = 0
-        self.__xEnd = random.random() * 10
-        self.__yEnd = random.random() * 10        
+        self.__xPos = 5
+        self.__yPos = 5
+               
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
@@ -49,12 +50,13 @@ class MountainCar:
             self.__yPos = 0
 
         cost = surface.getValue(self.__xPos, self.__yPos) - initialCost
-
-        return -1 - cost
+        if cost > 0:
+            return -1 - cost
+        return -1
 
     def isTerminal(self):
         '''Returns true if the world is in a terminal state (if the car is at the top of the hill).'''
-        return self.__xPos == self.__xEnd and self.__yPos == self.__yEnd
+        return math.fabs(self.__xPos - self.__xEnd) < 0.1 and math.fabs(self.__yPos - self.__yEnd) < 0.1
 
     def getState(self):
         '''Returns a tuple containing the position and velocity of the car, in that order.'''
@@ -137,7 +139,7 @@ def main():
     fout = open(args.output_file, "w")
     world = MountainCar()
 
-    displayError = False
+    displayError = True
     if args.display > 0:
         try:
             global turtle
@@ -166,7 +168,7 @@ def main():
         if args.trials > 1:
             print("Trial " + str(trial+1), end="")        
         featureGenerator = TileFeatures(world.getRanges(), [args.numtiles, args.numtiles], args.numtilings)
-        agent = LinearSarsaLearner(featureGenerator.getNumFeatures(), 3, args.alpha, args.epsilon, args.gamma)
+        agent = LinearSarsaLearner(featureGenerator.getNumFeatures(), 360, args.alpha, args.epsilon, args.gamma)
             
         for ep in range(args.episodes):
             if args.display > 0:
