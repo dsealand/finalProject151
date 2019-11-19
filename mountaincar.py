@@ -14,14 +14,14 @@ class MountainCar:
     '''Represents the Mountain Car problem.'''
     def __init__(self):
         self.reset()
-        self.__xEnd = random.random() * 10
-        self.__yEnd = random.random() * 10 
 
     def reset(self):
         '''Resets the problem to the initial state.'''                
         self.__xPos = 5
         self.__yPos = 5
-               
+
+        self.__xEnd = random.random() * 10
+        self.__yEnd = random.random() * 10               
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
@@ -36,8 +36,11 @@ class MountainCar:
         surface = Function()
         initialCost = surface.getValue(self.__xPos, self.__yPos)
 
-        self.__xPos += math.cos(actionRadian)
-        self.__yPos += math.sin(actionRadian)
+        self.__xPos += 0.316 * math.cos(actionRadian)
+        self.__yPos += 0.316 * math.sin(actionRadian)
+
+        # print(self.__xPos)
+        # print(self.__yPos)
 
         if self.__xPos > 10:
             self.__xPos = 10
@@ -56,7 +59,7 @@ class MountainCar:
 
     def isTerminal(self):
         '''Returns true if the world is in a terminal state (if the car is at the top of the hill).'''
-        return math.fabs(self.__xPos - self.__xEnd) < 0.1 and math.fabs(self.__yPos - self.__yEnd) < 0.1
+        return math.fabs(self.__xPos - self.__xEnd) < 1 and math.fabs(self.__yPos - self.__yEnd) < 1
 
     def getState(self):
         '''Returns a tuple containing the position and velocity of the car, in that order.'''
@@ -75,32 +78,59 @@ class MountainCarDisplay:
         '''Takes a MountainCar object and initializes the display.'''
         self.__world = world
 
+        surface = Function()
+
         #Create the window
-        turtle.setup(800, 400)
-        turtle.setworldcoordinates(-1.2, -1.1, 0.6, 1.1)
-        turtle.title("Mountain Car")
+        turtle.setup(800, 800)
+        turtle.setworldcoordinates(0, 0, 10, 10)
+        turtle.title("3d route finding")
         turtle.bgcolor(0.4, 0.7, 0.92)
         turtle.tracer(0)
+        turtle.colormode(255)
 
-        #Draw the hill
+        # draw surface
         hillT = turtle.Turtle()
         hillT.hideturtle()
         hillT.penup()
-        x = -1.3
-        y = math.sin(3*x)
-        hillT.goto(x, y)        
-        hillT.pendown()
-        hillT.pencolor(0, 0.5, 0.1)
-        hillT.fillcolor(0, 0.7, 0.1)
-        hillT.pensize(4)
+        x = 0
+        y = 0
+        hillT.goto(x, y)
+        # change color based on elevation
+        hillT.pencolor(0, surface.getValue(x, y), surface.getValue(x, y))
+        hillT.pensize(3)
         hillT.begin_fill()
-        while x < 0.7:
+        while x < 10:
             x += 0.1
-            y = math.sin(3*x)
+            while y < 10:
+                y+= 0.1
+                hillT.pencolor(surface.getValue(x, y), surface.getValue(x, y), surface.getValue(x, y))
+                hillT.goto(x, y)
+            y = 0
+            hillT.pencolor(surface.getValue(x, y), surface.getValue(x, y), surface.getValue(x, y))
             hillT.goto(x, y)
-        hillT.goto(0.7, -1.2)
-        hillT.goto(-1.3, -1.2)
         hillT.end_fill()
+
+
+
+        #Draw the hill
+        # hillT = turtle.Turtle()
+        # hillT.hideturtle()
+        # hillT.penup()
+        # x = -1.3
+        # y = math.sin(3*x)
+        # hillT.goto(x, y)        
+        # hillT.pendown()
+        # hillT.pencolor(0, 0.5, 0.1)
+        # hillT.fillcolor(0, 0.7, 0.1)
+        # hillT.pensize(4)
+        # hillT.begin_fill()
+        # while x < 0.7:
+        #     x += 0.1
+        #     y = math.sin(3*x)
+        #     hillT.goto(x, y)
+        # hillT.goto(0.7, -1.2)
+        # hillT.goto(-1.3, -1.2)
+        # hillT.end_fill()
 
         #Create the car turtle
         self.__carTurtle = turtle.Turtle()
@@ -115,7 +145,7 @@ class MountainCarDisplay:
     def update(self):
         '''Updates the display to reflect the current state.'''
         state = self.__world.getState()
-        self.__carTurtle.goto(state[0], math.sin(3*state[0])+.1)
+        self.__carTurtle.goto(state[0], state[1])
 
         turtle.update()
 
@@ -139,7 +169,7 @@ def main():
     fout = open(args.output_file, "w")
     world = MountainCar()
 
-    displayError = True
+    displayError = False
     if args.display > 0:
         try:
             global turtle
