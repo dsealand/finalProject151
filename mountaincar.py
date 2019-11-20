@@ -87,7 +87,7 @@ class MountainCarDisplay:
         turtle.setup(800, 800)
         turtle.setworldcoordinates(0, 0, 10, 10)
         turtle.title("3d route finding")
-        turtle.bgcolor(0.4, 0.7, 0.92)
+        turtle.bgcolor(1,1,1)
         turtle.tracer(0)
         turtle.colormode(255)
 
@@ -108,6 +108,7 @@ class MountainCarDisplay:
                 y += 0.1
                 functionValue = surface.getValue(x, y)
                 hillT.pencolor(0, 0, int(2.5*functionValue))
+                hillT.pendown()
                 hillT.goto(x, y)
             y = 0
             hillT.pencolor(0, 0, int(2.5*functionValue))
