@@ -39,8 +39,8 @@ class MountainCar:
         surface = Function()
         initialCost = surface.getValue(self.__xPos, self.__yPos)
 
-        self.__xPos += 0.316 * math.cos(actionRadian)
-        self.__yPos += 0.316 * math.sin(actionRadian)
+        self.__xPos += 0.1 * math.cos(actionRadian)
+        self.__yPos += 0.1 * math.sin(actionRadian)
 
         # print(self.__xPos)
         # print(self.__yPos)
@@ -87,7 +87,11 @@ class MountainCarDisplay:
         turtle.setup(800, 800)
         turtle.setworldcoordinates(0, 0, 10, 10)
         turtle.title("3d route finding")
+<<<<<<< HEAD
         turtle.bgcolor(1,1,1)
+=======
+        turtle.bgcolor(1, 1, 1)
+>>>>>>> 65b9042302de73274679f380ea76ad72cdcf7768
         turtle.tracer(0)
         turtle.colormode(255)
 
@@ -97,16 +101,19 @@ class MountainCarDisplay:
         hillT.penup()
         x = 0
         y = 0
+        hillT.penup()
         hillT.goto(x, y)
         # change color based on elevation
         hillT.pencolor(0, 0, 0)
-        hillT.pensize(1)
+        hillT.pensize(10)
         hillT.begin_fill()
         while x < 10:
             x += 0.1
             while y < 10:
                 y += 0.1
                 functionValue = surface.getValue(x, y)
+                print(functionValue)
+                hillT.pendown()
                 hillT.pencolor(0, 0, int(2.5*functionValue))
                 hillT.pendown()
                 hillT.goto(x, y)
