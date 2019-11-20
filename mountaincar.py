@@ -15,13 +15,16 @@ class MountainCar:
     def __init__(self):
         self.reset()
 
+        # self.__xEnd = random.random() * 10
+        # self.__yEnd = random.random() * 10 
+
     def reset(self):
         '''Resets the problem to the initial state.'''                
-        self.__xPos = 5
-        self.__yPos = 5
+        self.__xPos = random.random() * 10
+        self.__yPos = random.random() * 10
 
         self.__xEnd = random.random() * 10
-        self.__yEnd = random.random() * 10               
+        self.__yEnd = random.random() * 10
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
@@ -54,7 +57,7 @@ class MountainCar:
 
         cost = surface.getValue(self.__xPos, self.__yPos) - initialCost
         if cost > 0:
-            return -1 - cost
+            return -1 - 0.1*cost
         return -1
 
     def isTerminal(self):
@@ -96,21 +99,20 @@ class MountainCarDisplay:
         y = 0
         hillT.goto(x, y)
         # change color based on elevation
-        hillT.pencolor(0, surface.getValue(x, y), surface.getValue(x, y))
-        hillT.pensize(3)
+        hillT.pencolor(0, 0, 0)
+        hillT.pensize(1)
         hillT.begin_fill()
         while x < 10:
             x += 0.1
             while y < 10:
-                y+= 0.1
-                hillT.pencolor(surface.getValue(x, y), surface.getValue(x, y), surface.getValue(x, y))
+                y += 0.1
+                functionValue = surface.getValue(x, y)
+                hillT.pencolor(0, 0, int(2.5*functionValue))
                 hillT.goto(x, y)
             y = 0
-            hillT.pencolor(surface.getValue(x, y), surface.getValue(x, y), surface.getValue(x, y))
+            hillT.pencolor(0, 0, int(2.5*functionValue))
             hillT.goto(x, y)
         hillT.end_fill()
-
-
 
         #Draw the hill
         # hillT = turtle.Turtle()
@@ -136,9 +138,9 @@ class MountainCarDisplay:
         self.__carTurtle = turtle.Turtle()
         self.__carTurtle.shape("circle")
         self.__carTurtle.shapesize(1.5, 1.5, 3)
-        self.__carTurtle.fillcolor(1, 0, 0)
+        self.__carTurtle.fillcolor(255, 0, 0)
         self.__carTurtle.pencolor(0, 0, 0)
-        self.__carTurtle.penup()
+        self.__carTurtle.pendown()
 
         self.update()
             
