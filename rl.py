@@ -123,6 +123,10 @@ class LinearSarsaLearner:
             if qValue > maxQ:
                 maxQ = qValue
                 maxI = i
+            elif qValue == maxQ:
+                x = random.randint(0, 1)
+                if x == 1:
+                    maxI = i
         return maxI
         
     def learningStep(self, activeFeatures, action, reward, nextFeatures):

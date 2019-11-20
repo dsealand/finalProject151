@@ -1,5 +1,5 @@
 from tilefeatures import *
-from rl import *
+from rl import LinearSarsaLearner
 import sys
 import random
 import argparse
@@ -8,23 +8,26 @@ turtle = None #placeholder for turtle module
 
 class Function:    
     def getValue(self, x, y):
-        return x*y
+        return math.cos(x*y) + math.sin(x+y)
 
 class MountainCar:
     '''Represents the Mountain Car problem.'''
     def __init__(self):
         self.reset()
 
-        # self.__xEnd = random.random() * 10
-        # self.__yEnd = random.random() * 10 
+        self.__xEnd = random.random() * 10
+        self.__yEnd = random.random() * 10 
 
     def reset(self):
         '''Resets the problem to the initial state.'''                
-        self.__xPos = random.random() * 10
-        self.__yPos = random.random() * 10
+        # self.__xPos = random.random() * 10
+        # self.__yPos = random.random() * 10
 
-        self.__xEnd = random.random() * 10
-        self.__yEnd = random.random() * 10
+        self.__xPos = 5
+        self.__yPos = 5
+
+        # self.__xEnd = random.random() * 10
+        # self.__yEnd = random.random() * 10
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
@@ -39,8 +42,8 @@ class MountainCar:
         surface = Function()
         initialCost = surface.getValue(self.__xPos, self.__yPos)
 
-        self.__xPos += 0.316 * math.cos(actionRadian)
-        self.__yPos += 0.316 * math.sin(actionRadian)
+        self.__xPos += 0.1 * math.cos(actionRadian)
+        self.__yPos += 0.1 * math.sin(actionRadian)
 
         # print(self.__xPos)
         # print(self.__yPos)
