@@ -7,7 +7,6 @@ from tilefeatures import *
 import abc
 import math
 
-
 class QTableLearner(metaclass=abc.ABCMeta):
     '''Represents an abstract reinforcement learning agent that represents its Q function using a look-up table.'''
     def __init__(self, numStates, numActions, alpha, epsilon, gamma, initQ):
@@ -25,30 +24,33 @@ class QTableLearner(metaclass=abc.ABCMeta):
     
     def epsilonGreedy(self, state):
         '''With probability epsilon returns a uniform random action. Otherwise it returns a greedy action with respect to the current Q function (breaking ties randomly).'''
-        randomFloat = random.random()
-        if randomFloat <= self.epsilon:
-            output = random.choice([*range(self.numActions)])
+        x = random.random()
+
+        #with probability epsilon
+        if x <= self.epsilon:
+            #uniform random action
+            y = random.randint(0, self.numActions - 1)
+            return y
         else:
-            output = self.greedy(state)
-        return output
+            return self.greedy(state)
                             
     def greedy(self, state):
         '''Returns a greedy action with respect to the current Q function (breaking ties randomly).'''
-        actions = self.q[state]
-        maxQ = -math.inf
-        maxI = 0
-        for i in [*range(len(actions))]:
-            if actions[i] > maxQ:
-                maxQ = actions[i]
-                maxI = i
-        return maxI
-
+        maxVal = -math.inf
+        maxAction = None
+        for i in range(self.numActions):
+            if self.q[state][i] > maxVal:
+                maxVal = self.q[state][i]
+                maxAction = i
+            elif self.q[state][i] == maxVal:
+                x = random.randint(0,1)
+                if x == 1:
+                    maxAction = i
+        return maxAction
+                            
     def terminalStep(self, curState, action, reward):
         '''Performs the last learning step of an episode. Because the episode has terminated, the next Q-value is 0.'''
-        currentQ = self.q[curState][action]
-        newQ = currentQ + self.alpha * (reward - currentQ)
-        self.q[curState][action] = newQ
-        return 0
+        self.q[curState][action] = self.q[curState][action] + self.alpha * (reward - self.q[curState][action])
         
     @abc.abstractmethod
     def learningStep(self, curState, action, reward, nextState):
@@ -63,10 +65,9 @@ class SarsaLearner(QTableLearner):
         
     def learningStep(self, curState, action, reward, nextState):
         '''Performs a SARSA learning step based on the given transition. Returns the action the agent will take next.'''
-        nextAction = self.epsilonGreedy(curState)
-        currentQ = self.q[curState][action]
-        nextQ = currentQ + self.alpha * (reward + self.gamma * self.q[nextState][nextAction] - currentQ)
-        self.q[curState][action] = nextQ
+        nextAction = super().epsilonGreedy(nextState)
+        self.q[curState][action] = self.q[curState][action] + self.alpha * (reward + 
+            (self.gamma * self.q[nextState][nextAction]) - self.q[curState][action] )
         return nextAction
                 
 class QLearner(QTableLearner):
@@ -78,11 +79,11 @@ class QLearner(QTableLearner):
     def learningStep(self, curState, action, reward, nextState):
         '''Performs a Q-learning step based on the given transition. Returns the action the agent will take next.'''
         nextAction = self.greedy(nextState)
-        currentQ = self.q[curState][action]
-        nextQ = currentQ + self.alpha * (reward + self.gamma * self.q[nextState][nextAction] - currentQ)
-        self.q[curState][action] = nextQ
-        return nextAction
 
+        self.q[curState][action] = self.q[curState][action] + self.alpha * (reward + 
+            (self.gamma * self.q[nextState][nextAction]) - self.q[curState][action] )
+        return nextAction
+                        
 class LinearSarsaLearner:
     '''Represents an agent using SARSA with linear value function approximation, assuming binary features.'''
     def __init__(self, numFeatures, numActions, alpha, epsilon, gamma):
@@ -100,44 +101,50 @@ class LinearSarsaLearner:
 
     def getQValue(self, activeFeatures, action):
         '''Calculates the approximate Q-value of a state-action pair. It takes a list of indices of active features (feature value is 1) and the action.'''
-        qValue = 0
-        for feature in activeFeatures:
-            qValue += self.theta[action][feature]
-        return qValue
+        sum = 0
+        for j in activeFeatures:   
+            sum += self.theta[action][j]
+        return sum
                     
     def epsilonGreedy(self, activeFeatures):
         '''With probability epsilon returns a uniform random action. Otherwise it returns a greedy action with respect to the current Q function (breaking ties randomly).'''
-        randomFloat = random.random()
-        if randomFloat <= self.epsilon:
-            output = random.choice(range(self.numActions))
-        else:
-            output = self.greedy(activeFeatures)
-        return output
+        if self.epsilon != 0:
+            x = random.random()
 
+            #with probability epsilon
+            if x <= self.epsilon:
+                #uniform random action
+                y = random.randint(0, self.numActions - 1)
+                return y
+            else:
+                return self.greedy(activeFeatures)
+        return self.greedy(activeFeatures)
+                    
     def greedy(self, activeFeatures):
         '''Returns a greedy action with respect to the current Q function (breaking ties randomly).'''
-        maxQ = -math.inf
-        maxI = None
+        maxVal = -math.inf
+        maxAction = None
         for i in range(self.numActions):
-            qValue = self.getQValue(activeFeatures, i)
-            if qValue > maxQ:
-                maxQ = qValue
-                maxI = i
-        return maxI
+            q = self.getQValue(activeFeatures,i)
+            if q > maxVal:
+                maxVal = q
+                maxAction = i
+            elif q == maxVal:
+                x = random.randint(0,1)
+                if x == 1:
+                    maxAction = i
+        return maxAction
         
     def learningStep(self, activeFeatures, action, reward, nextFeatures):
         '''Performs a gradient descent SARSA learning step based on the given transition. Returns the action the agent will take next.'''
         nextAction = self.epsilonGreedy(nextFeatures)
-        currentQ = self.getQValue(activeFeatures, action)
-        delta = reward + self.gamma * self.getQValue(nextFeatures, nextAction) - currentQ
-        for i in activeFeatures:
-            self.theta[action][i] = self.theta[action][i] + self.alpha * delta
+        delta = reward + self.gamma * self.getQValue(nextFeatures, nextAction) - self.getQValue(activeFeatures, action)
+        for j in activeFeatures:
+            self.theta[action][j] = self.theta[action][j] + self.alpha * delta
         return nextAction
                         
     def terminalStep(self, activeFeatures, action, reward):
         '''Performs the last learning step of an episode. Because the episode has terminated, the next Q-value is 0.'''
-        currentQ = self.getQValue(activeFeatures, action)
-        delta = reward - currentQ
-        for i in activeFeatures:
-            self.theta[action][i] = self.theta[action][i] + self.alpha * delta
-        
+        q = self.getQValue(activeFeatures, action)
+        for j in activeFeatures:
+            self.theta[action][j] = self.theta[action][j] + self.alpha * (reward - q)
