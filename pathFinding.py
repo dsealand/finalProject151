@@ -141,11 +141,14 @@ class MountainCarDisplay:
             hillT.goto(x, y)
         hillT.end_fill()
 
+
+        hillT.setposition(world.getState()[2], world.getState()[3])
         hillT.pencolor(0, 0, 0)
-        hillT.pendown()
-        hillT.goto(world.getState()[2], world.getState()[3])
-        
         hillT.pensize(10)
+        hillT.dot(10)
+        # hillT.setposition(world.getState()[2]+1, world.getState()[3])
+        
+        
        
         hillT.penup()
 
