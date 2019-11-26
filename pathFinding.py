@@ -65,7 +65,6 @@ class MountainCar:
         return math.fabs(self.__xPos - self.__xEnd) < 1 and math.fabs(self.__yPos - self.__yEnd) < 1
 
     def getState(self):
-        '''Returns a tuple containing the position and velocity of the car, in that order.'''
         return (self.__xPos, self.__yPos, self.__xEnd, self.__yEnd)
 
     def getInitialState(self):
@@ -120,7 +119,7 @@ class MountainCarDisplay:
         while x < 10:
             while y < 10:
                 functionValue = surface.getValue(x, y)
-                hillT.pencolor(0, 0, int(2.5*functionValue))
+                hillT.pencolor(int(2.5*functionValue), 255, 255)
                 hillT.pendown()
                 hillT.goto(x, y)
                 
@@ -130,7 +129,7 @@ class MountainCarDisplay:
                 y += 0.1
             x += 0.1
             y = 0
-            hillT.pencolor(0, 0, int(2.5*functionValue))
+            hillT.pencolor(int(2.5*functionValue), 255, 255)
             hillT.goto(x, y)
         hillT.end_fill()
 
@@ -140,8 +139,8 @@ class MountainCarDisplay:
         self.__carTurtle.shape("circle")
         self.__carTurtle.shapesize(1.5, 1.5, 3)
         self.__carTurtle.fillcolor(255, 0, 0)
-        self.__carTurtle.pencolor(0, 255, 0)
-        self.__carTurtle.pendown()
+        self.__carTurtle.pencolor(255, 0, 0)
+
 
         self.update()
             
@@ -149,7 +148,7 @@ class MountainCarDisplay:
         '''Updates the display to reflect the current state.'''
         state = self.__world.getState()
         self.__carTurtle.goto(state[0], state[1])
-
+        self.__carTurtle.pendown()
         turtle.update()
 
     def exitOnClick(self):
@@ -240,6 +239,7 @@ def main():
             totalR += reward
             discountedR += discount*reward            
             step = 1
+            display = MountainCarDisplay(world)
             while not world.isTerminal() and step < args.maxsteps:
                 newFeatures = featureGenerator.getFeatures(world.getState())             
                 action = agent.learningStep(activeFeatures, action, reward, newFeatures)
