@@ -123,17 +123,18 @@ class LinearSarsaLearner:
     def greedy(self, activeFeatures):
         '''Returns a greedy action with respect to the current Q function (breaking ties randomly).'''
         maxVal = -math.inf
-        maxAction = None
+        values = [0] * 360
         for i in range(self.numActions):
             q = self.getQValue(activeFeatures,i)
             if q > maxVal:
                 maxVal = q
-                maxAction = i
-            elif q == maxVal:
-                x = random.randint(0,1)
-                if x == 1:
-                    maxAction = i
-        return maxAction
+            values[i] = q
+        maxValues = []
+        for i in range(len(values)):
+            if values[i] == maxVal:
+                maxValues.append(i)
+        action = random.randint(0,len(maxValues) - 1)
+        return action
         
     def learningStep(self, activeFeatures, action, reward, nextFeatures):
         '''Performs a gradient descent SARSA learning step based on the given transition. Returns the action the agent will take next.'''
