@@ -92,8 +92,6 @@ class MountainCarDisplay:
         '''Takes a MountainCar object and initializes the display.'''
         self.__world = world
 
-        surface = Function()
-
         #Create the window
         turtle.setup(800, 800)
         turtle.setworldcoordinates(0, 0, 10, 10)
@@ -101,6 +99,20 @@ class MountainCarDisplay:
         turtle.bgcolor(1, 1, 1)
         turtle.tracer(0)
         turtle.colormode(255)
+
+        self.drawBackground(world)
+
+        self.update()
+            
+    def update(self):
+        '''Updates the display to reflect the current state.'''
+        state = self.__world.getState()
+        self.__carTurtle.goto(state[0], state[1])
+        self.__carTurtle.pendown()
+        turtle.update()
+
+    def drawBackground(self, world):
+        surface = Function()
 
         # draw surface
         hillT = turtle.Turtle()
@@ -117,20 +129,25 @@ class MountainCarDisplay:
         while x < 10:
             while y < 10:
                 functionValue = surface.getValue(x, y)
-                hillT.pencolor(int(2.5*functionValue), 255, 255)
+                hillT.pencolor(int(11*functionValue), 255, 255)
                 hillT.pendown()
                 hillT.goto(x, y)
                 
-                hillT.penup()
-                
-                
+                hillT.penup()                
                 y += 0.1
             x += 0.1
             y = 0
-            hillT.pencolor(int(2.5*functionValue), 255, 255)
+            hillT.pencolor(int(11*functionValue), 255, 255)
             hillT.goto(x, y)
         hillT.end_fill()
 
+        hillT.pencolor(0, 0, 0)
+        hillT.pendown()
+        hillT.goto(world.getState()[2], world.getState()[3])
+        
+        hillT.pensize(10)
+       
+        hillT.penup()
 
         #Create the car turtle
         self.__carTurtle = turtle.Turtle()
@@ -138,16 +155,6 @@ class MountainCarDisplay:
         self.__carTurtle.shapesize(1.5, 1.5, 3)
         self.__carTurtle.fillcolor(255, 0, 0)
         self.__carTurtle.pencolor(255, 0, 0)
-
-
-        self.update()
-            
-    def update(self):
-        '''Updates the display to reflect the current state.'''
-        state = self.__world.getState()
-        self.__carTurtle.goto(state[0], state[1])
-        self.__carTurtle.pendown()
-        turtle.update()
 
     def exitOnClick(self):
         turtle.exitonclick()
@@ -203,6 +210,8 @@ def main():
         repeatGoals = [0] * 10
         repeatStarts = [0] * 10
         for ep in range(args.episodes):
+            display.drawBackground(world)
+
             if args.display > 0:
                 displayEp = ep == 0 or (ep+1)%args.display == 0
             else:
@@ -237,7 +246,6 @@ def main():
             totalR += reward
             discountedR += discount*reward            
             step = 1
-            display = MountainCarDisplay(world)
             while not world.isTerminal() and step < args.maxsteps:
                 newFeatures = featureGenerator.getFeatures(world.getState())             
                 action = agent.learningStep(activeFeatures, action, reward, newFeatures)
