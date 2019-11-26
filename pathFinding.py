@@ -8,15 +8,16 @@ turtle = None #placeholder for turtle module
 
 class Function:    
     def getValue(self, x, y):
-        return x*y
+        
+        if 3 <= x and x <= 7 and 3 <= y and y <= 7:
+            return 20
+        return 0
+
 
 class MountainCar:
     '''Represents the Mountain Car problem.'''
     def __init__(self):
         self.reset()
-
-        # self.__xEnd = random.random() * 10
-        # self.__yEnd = random.random() * 10 
 
     def reset(self):
         '''Resets the problem to the initial state.'''                
@@ -41,9 +42,6 @@ class MountainCar:
 
         self.__xPos += 0.1 * math.cos(actionRadian)
         self.__yPos += 0.1 * math.sin(actionRadian)
-
-        # print(self.__xPos)
-        # print(self.__yPos)
 
         if self.__xPos > 10:
             self.__xPos = 10
