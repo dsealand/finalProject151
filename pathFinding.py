@@ -21,11 +21,11 @@ class MountainCar:
 
     def reset(self):
         '''Resets the problem to the initial state.'''                
-        self.__xPos = 2 #random.random() * 10
-        self.__yPos = 2 #random.random() * 10
+        self.__xPos = random.random() * 10
+        self.__yPos = random.random() * 10
 
-        self.__xEnd = 7.8 #random.random() * 10
-        self.__yEnd = 8.2 #random.random() * 10
+        self.__xEnd = random.random() * 10
+        self.__yEnd = random.random() * 10
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
@@ -234,12 +234,12 @@ def main():
                 repeatStarts[ep] = world.getInitialState()
 
             if args.episodes - ep < 10:
-                xEnd = repeatGoals[args.episodes - ep][0]
-                yEnd = repeatGoals[args.episodes - ep][1]
+                xEnd = repeatGoals[9-(args.episodes - ep)][0]
+                yEnd = repeatGoals[9-(args.episodes - ep)][1]
                 world.setTerminalState(xEnd,yEnd)
 
-                x = repeatStarts[args.episodes - ep][0]
-                y = repeatStarts[args.episodes - ep][1]
+                x = repeatStarts[9-(args.episodes - ep)][0]
+                y = repeatStarts[9-(args.episodes - ep)][1]
                 world.setInitialState(x,y)
 
             activeFeatures = featureGenerator.getFeatures(world.getState())
