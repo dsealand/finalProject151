@@ -8,9 +8,9 @@ turtle = None #placeholder for turtle module
 
 class Function:    
     def getValue(self, x, y):
-        
-        if 3 <= x and x <= 7 and 3 <= y and y <= 7:
-            return 20
+        functionValue = -((x-5)**2 + (y-5)**2)**0.5 + 4
+        if functionValue >= 0:
+            return functionValue
         return 0
 
 
@@ -21,11 +21,11 @@ class MountainCar:
 
     def reset(self):
         '''Resets the problem to the initial state.'''                
-        self.__xPos = random.random() * 10
-        self.__yPos = random.random() * 10
+        self.__xPos = 2 #random.random() * 10
+        self.__yPos = 2 #random.random() * 10
 
-        self.__xEnd = random.random() * 10
-        self.__yEnd = random.random() * 10
+        self.__xEnd = 7.8 #random.random() * 10
+        self.__yEnd = 8.2 #random.random() * 10
         
     def transition(self, action):
         '''Transitions to the next state, depending on the action. Actions 0, 1, and 2 are reverse, neutral, and forward, respectively. Returns the reward from the transition (always -1).'''        
@@ -40,8 +40,8 @@ class MountainCar:
         surface = Function()
         initialCost = surface.getValue(self.__xPos, self.__yPos)
 
-        self.__xPos += 0.1 * math.cos(actionRadian)
-        self.__yPos += 0.1 * math.sin(actionRadian)
+        self.__xPos += 0.5 * math.cos(actionRadian)
+        self.__yPos += 0.5 * math.sin(actionRadian)
 
         if self.__xPos > 10:
             self.__xPos = 10
@@ -55,7 +55,7 @@ class MountainCar:
 
         cost = surface.getValue(self.__xPos, self.__yPos) - initialCost
         if cost > 0:
-            return -1 - cost
+            return -1 - 10 *cost
         return -1
 
     def isTerminal(self):
@@ -107,8 +107,9 @@ class MountainCarDisplay:
     def update(self):
         '''Updates the display to reflect the current state.'''
         state = self.__world.getState()
+        self.__carTurtle.penup()
         self.__carTurtle.goto(state[0], state[1])
-        self.__carTurtle.pendown()
+        
         turtle.update()
 
     def drawBackground(self, world):
@@ -129,7 +130,7 @@ class MountainCarDisplay:
         while x < 10:
             while y < 10:
                 functionValue = surface.getValue(x, y)
-                hillT.pencolor(int(11*functionValue), 255, 255)
+                hillT.pencolor(int(50*functionValue), 0, 100)
                 hillT.pendown()
                 hillT.goto(x, y)
                 
@@ -137,13 +138,13 @@ class MountainCarDisplay:
                 y += 0.1
             x += 0.1
             y = 0
-            hillT.pencolor(int(11*functionValue), 255, 255)
+            hillT.pencolor(int(50*functionValue), 0, 100)
             hillT.goto(x, y)
         hillT.end_fill()
 
 
         hillT.setposition(world.getState()[2], world.getState()[3])
-        hillT.pencolor(0, 0, 0)
+        hillT.pencolor(255, 255, 255)
         hillT.pensize(10)
         hillT.dot(10)
         # hillT.setposition(world.getState()[2]+1, world.getState()[3])
@@ -207,13 +208,13 @@ def main():
     for trial in range(args.trials):
         if args.trials > 1:
             print("Trial " + str(trial+1), end="")        
-        featureGenerator = TileFeatures(world.getRanges(), [args.numtiles, args.numtiles, args.numtiles, args.numtiles], args.numtilings)
+        featureGenerator = TileFeatures(world.getRanges(), [args.numtiles, args.numtiles,args.numtiles, args.numtiles], args.numtilings)
         agent = LinearSarsaLearner(featureGenerator.getNumFeatures(), 360, args.alpha, args.epsilon, args.gamma)
 
         repeatGoals = [0] * 10
         repeatStarts = [0] * 10
         for ep in range(args.episodes):
-            display.drawBackground(world)
+            #display.drawBackground(world)
 
             if args.display > 0:
                 displayEp = ep == 0 or (ep+1)%args.display == 0
